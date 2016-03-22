@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/solr
+
+# run docker
+docker run -d   -v $FOLDER_PATH/$1/solrcloud:/home/ecareme/src/solrcloud \
+                -v $FOLDER_PATH/$1/etc:/home/ecareme/etc \
+                -v $FOLDER_PATH/script:/home/ecareme/script \
+                -p $SOLR_PORT:$SOLR_PORT \
+                --name $1_solr \
+                $2 \
+                /bin/bash -c ./home/ecareme/script/run
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE
