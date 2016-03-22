@@ -1,0 +1,5 @@
+JAVA_OPTS="-Djava.awt.headless=true -Xmx128m -XX:+UseConcMarkSweepGC"
+JAVA_OPTS="${JAVA_OPTS} -Duploadfailure.logging.root=/home/ecareme/amos/amosuploadfailure"
+JAVA_OPTS="${JAVA_OPTS} -Dcom.ecareme.cloud.amos.server.config=/home/ecareme/etc/amos/amosserverconfig.xml"
+JAVA_OPTS="${JAVA_OPTS} -Dservice.logging.root=/home/ecareme/log/"
+JAVA_OPTS="${JAVA_OPTS} -Dcom.asuscloud.cloud.server.enableActionLog=true"
