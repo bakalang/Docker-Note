@@ -1,0 +1,21 @@
+#!/bin/bash
+#	execute in container 
+
+# set tomcat config
+./home/ecareme/script/config
+
+# mount device
+mkdir /media/sd
+mount -t ext4 /dev/sdc1 /media/sd
+
+# mkdir uploadfailure
+mkdir /home/ecareme/amos/
+mkdir /home/ecareme/amos/uploadfailure/
+chmod -R 777 /home/ecareme/amos/
+
+# start tomcat
+service tomcat7 start;
+
+# keep container running
+tail -f /var/log/tomcat7/catalina.out;
+
