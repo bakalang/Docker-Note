@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# read tomcat env variable
+tomcat_otps='/home/ecareme/script/tomcat_otps'
+exec < $tomcat_otps
+
+# set tomcat env variable
+while read line_otps
+do
+    echo $line_otps >> /etc/default/tomcat7
+done
+
+# tomcat server configeration
+echo '<Context path="/" reloadable="true" docBase="/home/ecareme/src/amos" />' >> /etc/tomcat7/Catalina/localhost/amos.xml
+
