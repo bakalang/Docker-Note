@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/amos/bak
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/sd
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+sed -i "s/LOCALHOST/$LOCALHOST/"                $FOLDER_PATH/$1/etc/amosserverconfig.xml
+sed -i "s/METADATA_PORT/$AREA2_METADATA_PORT/"  $FOLDER_PATH/$1/etc/amosserverconfig.xml
+sed -i "s/AMOS_PORT/$AREA2_AMOS_PORT/"  $FOLDER_PATH/$1/etc/amosserverconfig.xml
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/sd $FOLDER_PATH/$1/$1_amos.zip
+
+# run docker
+docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/amos \
+                -v $FOLDER_PATH/$1/sd:/home/ecareme/src/sd \
+                -v $FOLDER_PATH/script:/home/ecareme/script \
+                -v /media/root/sd:/home/ecareme/sd \
+                -p $AREA2_AMOS_PORT:8080 \
+                --name sd2_$1 \
+                $2 \
+                /bin/bash -c ./home/ecareme/script/run
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE
