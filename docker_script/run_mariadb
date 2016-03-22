@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --name mariadb -v /root/文件/mariadb/:/var/lib/mysql -p 13306:3306 -e MYSQL_ROOT_PASSWORD=cc -d mariadb:latest
