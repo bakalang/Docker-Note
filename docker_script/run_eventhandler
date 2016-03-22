@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/eventhandler/bak
+CONTAINER_NAME=$1_eventhandler
+mkdir $HOST_LOG_PATH/$CONTAINER_NAM
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/eventhandler
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/eventhandler $FOLDER_PATH/$1/$1_eventhandler.zip
+
+# run docker
+docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/eventhandler \
+                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+                -v $FOLDER_PATH/$1/eventhandler:/home/ecareme/src/eventhandler \
+                -v $FOLDER_PATH/script:/home/ecareme/script \
+                -p $EVENT_HANDLER_PORT:8080 \
+                --name $CONTAINER_NAME \
+                $2 \
+                /bin/bash -c ./home/ecareme/script/run
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
