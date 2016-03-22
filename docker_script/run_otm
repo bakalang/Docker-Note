@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/otm/bak
+CONTAINER_NAME=$1_otm
+mkdir $HOST_LOG_PATH/$CONTAINER_NAME
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/otm
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+sed -i "s/TRUST_INNER_IP/$TRUST_INNER_IP/" $FOLDER_PATH/$1/etc/otm.properties
+sed -i "s/TRUST_IP_1_RANGE/$TRUST_IP_1_RANGE/" $FOLDER_PATH/$1/etc/otm.properties
+sed -i "s/TRUST_IP_100_RANGE/$TRUST_IP_100_RANGE/" $FOLDER_PATH/$1/etc/otm.properties
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/otm $FOLDER_PATH/$1/$1_otm.zip
+
+# run docker
+docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/otm \
+                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+                -v $FOLDER_PATH/$1/otm:/home/ecareme/src/otm \
+                -v $FOLDER_PATH/script:/home/ecareme/script \
+                -p $OTM_PORT:8080 \
+                --name $CONTAINER_NAME \
+                $2 \
+                /bin/bash -c ./home/ecareme/script/run
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE
