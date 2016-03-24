@@ -1,11 +1,13 @@
 # DockerNote
+1. os upstart<br>
+2. docker script<br>
+3. execute script in container<br>
+4. fluentd<br>
 
-1. os upstart
 
-2. docker script
-
-3. execute script in container
-
-4. fluentd
-
+# notice
+*container內部權現問題<br>
+*container要重新校時<br>
+*container無法共同存取volume<br>
+*container刪除帶參數-v 一併刪除volume<br>
 
