@@ -22,13 +22,13 @@ unzip -d $FOLDER_PATH/$1/otm $FOLDER_PATH/$1/$1_otm.zip
 
 # run docker
 docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/otm \
-                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
-                -v $FOLDER_PATH/$1/otm:/home/ecareme/src/otm \
-                -v $FOLDER_PATH/script:/home/ecareme/script \
-                -p $OTM_PORT:8080 \
-                --name $CONTAINER_NAME \
-                $2 \
-                /bin/bash -c ./home/ecareme/script/run
+		-v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/$1/otm:/home/ecareme/src/otm \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $OTM_PORT:8080 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run 
 
 # syncState
 #java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2

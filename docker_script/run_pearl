@@ -14,15 +14,16 @@ rm -rf $FOLDER_PATH/$1/pearl
 unzip -d $FOLDER_PATH/$1/pearl $FOLDER_PATH/$1/$1_pearl.zip
 
 # run docker
-docker run -d   -v $FOLDER_PATH/$1/pearl:/home/ecareme/pearl \
-                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
-                -v $FOLDER_PATH/etc:/home/ecareme/etc/pearl \
-                -v $FOLDER_PATH/script:/home/ecareme/script \
-                -p $PEARL_PORT:61616 \
-                --name $CONTAINER_NAME \
-                $2 \
-                /bin/bash -c ./home/ecareme/script/run
+docker run -d 	-v $FOLDER_PATH/$1/pearl:/home/ecareme/pearl \
+		-v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/etc:/home/ecareme/etc/pearl \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $PEARL_PORT:61616 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run 
 
 # syncState
 #java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
 
+#rm $FOLDER_MANE

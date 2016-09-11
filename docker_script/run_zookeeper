@@ -1,3 +1,6 @@
 #!/bin/bash
 source docker_env
-docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 jplock/zookeeper
+
+#docker run -d -p $AREA2_ZOOKEEPER_PORT:2131 jplock/zookeeper:latest
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --name zk jplock/zookeeper
+

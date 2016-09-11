@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # docker source
 source docker_env
@@ -11,6 +11,7 @@ mkdir $HOST_LOG_PATH/$CONTAINER_NAME
 rm -rf $FOLDER_PATH/$1/etc
 rm -rf $FOLDER_PATH/$1/http
 rm -rf $FOLDER_PATH/$1/https
+rm $FOLDER_PATH/$1/container_id
 
 # setup config
 cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
@@ -30,6 +31,8 @@ sed -i "s/TRUST_IP_100_RANGE/$TRUST_IP_100_RANGE/" $FOLDER_PATH/$1/etc/apiconfig
 sed -i "s/TRUST_IP_150_RANGE/$TRUST_IP_150_RANGE/" $FOLDER_PATH/$1/etc/apiconfig.xml
 sed -i "s/TRUST_INNER_IP/$TRUST_INNER_IP/" $FOLDER_PATH/$1/etc/apiconfig.xml
 
+sed -i "s/GATEWAY_SSL/$AREA2_GATEWAY_SSL/" $FOLDER_PATH/$1/etc/apiconfig.xml
+
 sed -i "s/OTM_PORT/$OTM_PORT/" $FOLDER_PATH/$1/etc/otm-client.properties
 
 # do unzip
@@ -37,16 +40,24 @@ unzip -d $FOLDER_PATH/$1/http $FOLDER_PATH/$1/$1_portalapi.zip
 unzip -d $FOLDER_PATH/$1/https $FOLDER_PATH/$1/$1_portalapi_ssl.zip
 
 # run docker
-docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/sp \
-                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
-                -v $FOLDER_PATH/$1/http:/home/ecareme/src/sp/http \
-                -v $FOLDER_PATH/$1/https:/home/ecareme/src/sp/https \
-                -v $FOLDER_PATH/script:/home/ecareme/script \
-                -p $PORTAL_PORT:8080 \
-                -p $PORTAL_SSL:8443 \
-                --name $CONTAINER_NAME \
-                $2 \
-                /bin/bash -c ./home/ecareme/script/run
+docker run -d -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $PORTAL_PORT:8080 \
+		-p $PORTAL_SSL:8443 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id)
+echo $CONTAINER_ID
+
+docker cp $FOLDER_PATH/$1/etc $CONTAINER_ID:/home/ecareme/etc/sp
+docker cp $FOLDER_PATH/$1/http $CONTAINER_ID:/home/ecareme/src/sp
+docker cp $FOLDER_PATH/$1/https $CONTAINER_ID:/home/ecareme/src/sp
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
 
 # syncState
 #java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2

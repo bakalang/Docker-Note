@@ -10,6 +10,7 @@ mkdir $HOST_LOG_PATH/$CONTAINER_NAM
 
 rm -rf $FOLDER_PATH/$1/etc
 rm -rf $FOLDER_PATH/$1/eventhandler
+rm $FOLDER_PATH/$1/container_id
 
 # setup config
 cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
@@ -18,15 +19,24 @@ cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
 unzip -d $FOLDER_PATH/$1/eventhandler $FOLDER_PATH/$1/$1_eventhandler.zip
 
 # run docker
-docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/eventhandler \
-                -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
-                -v $FOLDER_PATH/$1/eventhandler:/home/ecareme/src/eventhandler \
-                -v $FOLDER_PATH/script:/home/ecareme/script \
-                -p $EVENT_HANDLER_PORT:8080 \
-                --name $CONTAINER_NAME \
-                $2 \
-                /bin/bash -c ./home/ecareme/script/run
+docker run -d -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $EVENT_HANDLER_PORT:8080 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id)
+echo $CONTAINER_ID
+
+docker cp $FOLDER_PATH/$1/etc $CONTAINER_ID:/home/ecareme/etc/eventhandler
+docker cp $FOLDER_PATH/$1/eventhandler $CONTAINER_ID:/home/ecareme/src
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
 
 # syncState
 #java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
 
+#rm $FOLDER_MANE

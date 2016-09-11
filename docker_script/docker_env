@@ -1,6 +1,8 @@
 export SOURCE_PATH=/root/文件/build_source/
 export HOST_LOG_PATH=/root/文件/log/
 export LOG_ROOT=/home/ecareme/log/
+export PIPE_ROOT=/root/文件/pipe/pipework-master/
+export SD_PATH=/media/root/sdb1
 export LOCALHOST=192.168.1.220
 export TRUST_IP_1_RANGE=192.168.1.1-192.168.1.255
 export TRUST_IP_3_RANGE=192.168.3.1-192.168.3.255
@@ -19,6 +21,7 @@ export DB_PASSWORD=cc
 export DB_ONE=dev_one
 export DB_WOW=wow
 export DB_AREA_2=dev_store2
+export DB_PRIVATE=PrivateCloud
 export DB_META_LINUX=dev_meta_linux
 #export DB_AREA_3=dev_store3
 #export DB_META_3=dev_meta_linux
@@ -26,6 +29,10 @@ export DB_META_LINUX=dev_meta_linux
 #portal
 export PORTAL_PORT=11001
 export PORTAL_SSL=11002
+export AMOS_1_PORT=13001
+export AMOS_2_PORT=13002
+export AMOS_1=192.168.1.191
+export AMOS_2=192.168.1.192
 
 export OTM_PORT=11003
 export OAUTH_PORT=11014
@@ -36,6 +43,24 @@ export PEARL_PORT=61616
 export SOLR_PORT=20011
 export SOLRCOMMANDER_PORT=20012
 export EVENT_HANDLER_PORT=20013
+
+#private
+export SERVICE_AREA_PRIVATE=20
+export PRIVATE_GATEWAY_PORT=20014
+export PRIVATE_GATEWAY_SSL=20015
+export PRIVATE_IR_PORT=20031
+export PRIVATE_IR_SSL=20032
+export PRIVATE_WR_PORT=20035
+export PRIVATE_WR_SSL=20036
+export BROKER_PORT=20016
+export BROKER_SSL=20017
+export GLOBAL_LICENSE_PORT=20020
+export GLOBAL_LICENSE_SSL=20021
+export LOCAL_LICENSE_PORT=20022
+export LOCAL_LICENSE_SSL=20023
+export PRIVATE_ZOOKEEPER_PORT=22181
+
+
 
 #area 1
 export SERVICE_AREA_1=1
@@ -52,6 +77,10 @@ export AREA2_MANAGERSTUDIO_SSL=11007
 export AREA2_IR_PORT=11008
 export AREA2_IR_SSL=11009
 export AREA2_METADATA_PORT=11010
-export AREA2_AMOS_PORT=11011
 export AREA2_WR_PORT=11012
 export AREA2_WR_SSL=11013
+export AREA2_SEARCH_PORT=11015
+export AREA2_SEARCH_SSL=11016
+
+
+
