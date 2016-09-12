@@ -1,0 +1,22 @@
+#!/bin/bash
+rtn=0
+
+function checkHTTP(){
+  url="192.168.1.220:$2/version"
+  #code=`curl -sL -w "%{http_code}\\n" "$url" -o /dev/null`
+  version=`curl -sl "$url" | grep version `
+  echo "$1, $version"
+  if [ "$version" = null ]
+  then
+      rtn=1
+  fi
+}
+
+checkHTTP SERVICE_PORTAL 11001
+checkHTTP SERVICE_GATEWAY_1 12004
+checkHTTP SERVICE_GATEWAY_2 11004
+checkHTTP INFO_RELAY 11008
+checkHTTP WEB_RELAY 11012/webrelay
+checkHTTP MANAGER_STUDIO 11006/managerstudio
+
+exit "$rtn"

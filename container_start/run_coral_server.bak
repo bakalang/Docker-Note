@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/coral/bak_server
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/server
+rm -rf $FOLDER_PATH/$1/filerepository
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/coralserver.plist.xml
+sed -i "s/AREA_ZOOKEEPER_PORT/$AREA_ZOOKEEPER_PORT/" $FOLDER_PATH/$1/etc/coralserver.plist.xml
+
+# do unzip
+unzip -d $FOLDER_PATH/$1 $FOLDER_PATH/$1/$1_coral_server.zip
+
+# run docker
+docker run -d -v $FOLDER_PATH/$1/etc:/home/ecareme/etc/server \
+		-v $FOLDER_PATH/$1/server:/home/ecareme/src/server \
+		-v $FOLDER_PATH/$1/filerepository:/home/ecareme/src/filerepository \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $CORAL_SERVER_PORT:8080 \
+		--name coral_server_$1 \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run 
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE

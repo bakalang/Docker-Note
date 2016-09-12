@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# docker source
+source ../docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore.metadataserver/MetadataServerAPI/bak
+CONTAINER_NAME=$1_metadataserver
+mkdir $HOST_LOG_PATH/$CONTAINER_NAME
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/md
+rm $FOLDER_PATH/$1/container_id
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+sed -i "s/DB_DRIVER_URL/$DB_DRIVER_URL/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_META/$DB_META_LINUX/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_USER/$DB_USER/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_PASSWORD/$DB_PASSWORD/" $FOLDER_PATH/$1/etc/proxool.xml
+
+sed -i "s/TRUST_IP_1_RANGE/$TRUST_IP_1_RANGE/" $FOLDER_PATH/$1/etc/apiconfig.xml
+sed -i "s/TRUST_IP_3_RANGE/$TRUST_IP_3_RANGE/" $FOLDER_PATH/$1/etc/apiconfig.xml
+sed -i "s/TRUST_IP_100_RANGE/$TRUST_IP_100_RANGE/" $FOLDER_PATH/$1/etc/apiconfig.xml
+sed -i "s/TRUST_IP_150_RANGE/$TRUST_IP_150_RANGE/" $FOLDER_PATH/$1/etc/apiconfig.xml
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/apiconfig.xml
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/md $FOLDER_PATH/$1/$1_metadataServer.zip
+
+# run docker
+docker run -d 	-v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $AREA2_METADATA_PORT:8080 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id)
+echo $CONTAINER_ID
+
+docker cp $FOLDER_PATH/$1/etc $CONTAINER_ID:/home/ecareme/etc/md
+docker cp $FOLDER_PATH/$1/md $CONTAINER_ID:/home/ecareme/src
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
+
+

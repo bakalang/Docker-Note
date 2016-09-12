@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/amos/bak
+CONTAINER_NAME=$1_amos_1
+mkdir $HOST_LOG_PATH/$CONTAINER_NAME
+
+ETC_PATH=$FOLDER_PATH/$1/etc_1
+
+rm -rf $ETC_PATH
+rm -rf $FOLDER_PATH/$1/sd
+rm $FOLDER_PATH/$1/container_id_1
+
+# setup config
+cp -R $FOLDER_PATH/etc $ETC_PATH
+
+sed -i "s/LOCALHOST/$LOCALHOST/" 		$ETC_PATH/amosserverconfig.xml
+sed -i "s/METADATA_PORT/$AREA2_METADATA_PORT/" 	$ETC_PATH/amosserverconfig.xml
+sed -i "s/PAIR_0/A/"  				$ETC_PATH/amosserverconfig.xml
+sed -i "s/PAIR_1/B/"  				$ETC_PATH/amosserverconfig.xml
+sed -i "s/PAIR_2/C/"  				$ETC_PATH/amosserverconfig.xml
+sed -i "s/AMOS_IP/$AMOS_1/"			$ETC_PATH/MasqueradingIp.xml
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/sd $FOLDER_PATH/$1/$1_amos.zip
+
+# run docker
+docker run -d -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-v $SD_PATH/amos_A:/home/sd/A \
+		-v $SD_PATH/amos_B:/home/sd/B \
+		-v $SD_PATH/amos_C:/home/sd/C \
+		--name $CONTAINER_NAME \
+		-p $AMOS_1:80:8080 \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id_1
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id_1)
+echo $CONTAINER_ID
+
+docker cp $ETC_PATH $CONTAINER_ID:/home/ecareme/etc/amos
+docker cp $FOLDER_PATH/$1/sd $CONTAINER_ID:/home/ecareme/src
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
+
+#cd $PIPE_ROOT
+#sudo ./pipework br0 $CONTAINER_NAME $AMOS_1_IP/24

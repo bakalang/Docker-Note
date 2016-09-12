@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# docker source
+source ../docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore.filerelay/inforelayapi/bak
+CONTAINER_NAME=$1_ir_area2
+mkdir $HOST_LOG_PATH/$CONTAINER_NAME
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/inforelayapi
+rm $FOLDER_PATH/$1/container_id
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+sed -i "s/DB_DRIVER_URL/$DB_DRIVER_URL/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_AREA/$DB_AREA_2/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_USER/$DB_USER/" $FOLDER_PATH/$1/etc/proxool.xml
+sed -i "s/DB_PASSWORD/$DB_PASSWORD/" $FOLDER_PATH/$1/etc/proxool.xml
+
+sed -i "s/SERVICE_AREA/$SERVICE_AREA_2/" $FOLDER_PATH/$1/etc/areaconfig.xml
+
+sed -i "s/TRUST_IP_1_RANGE/$TRUST_IP_1_RANGE/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+sed -i "s/TRUST_IP_3_RANGE/$TRUST_IP_3_RANGE/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+sed -i "s/TRUST_IP_100_RANGE/$TRUST_IP_100_RANGE/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+sed -i "s/TRUST_IP_150_RANGE/$TRUST_IP_150_RANGE/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+sed -i "s/TRUST_IP_TW/$TRUST_IP_TW/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/inforelayapiconfig.xml
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/inforelayapi $FOLDER_PATH/$1/$1_inforelayapi.zip
+
+# run docker
+docker run -d -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $AREA2_IR_PORT:8080 \
+		-p $AREA2_IR_SSL:8443 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id)
+echo $CONTAINER_ID 
+
+docker cp $FOLDER_PATH/$1/etc $CONTAINER_ID:/home/ecareme
+docker cp $FOLDER_PATH/$1/inforelayapi $CONTAINER_ID:/home/ecareme/src
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE

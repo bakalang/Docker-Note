@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# declare
+FOLDER_PATH=$SOURCE_PATH/omnistore_cloud/license/locallicense/bak
+CONTAINER_NAME=$1_locallicense
+mkdir $HOST_LOG_PATH/$CONTAINER_NAME
+
+rm -rf $FOLDER_PATH/$1/etc
+rm -rf $FOLDER_PATH/$1/locallicense
+rm $FOLDER_PATH/$1/container_id
+
+# setup config
+cp -R $FOLDER_PATH/etc $FOLDER_PATH/$1/etc
+
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/licenseapiconfig.xml
+sed -i "s/GLOBAL_LICENSE_SSL/$GLOBAL_LICENSE_SSL/" $FOLDER_PATH/$1/etc/licenseapiconfig.xml
+
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/ZkHosts.properties
+sed -i "s/ZOOKEEPER_PORT/$PRIVATE_ZOOKEEPER_PORT/" $FOLDER_PATH/$1/etc/ZkHosts.properties
+sed -i "s/LOCALHOST/$LOCALHOST/" $FOLDER_PATH/$1/etc/ZkReadonlyHosts.properties
+sed -i "s/ZOOKEEPER_PORT/$PRIVATE_ZOOKEEPER_PORT/" $FOLDER_PATH/$1/etc/ZkReadonlyHosts.properties
+
+# do unzip
+unzip -d $FOLDER_PATH/$1/locallicense $FOLDER_PATH/$1/$1_locallicense.zip
+
+# run docker
+docker run -d -v $HOST_LOG_PATH/$CONTAINER_NAME:$LOG_ROOT \
+		-v $FOLDER_PATH/script:/home/ecareme/script \
+		-p $LOCAL_LICENSE_PORT:8080 \
+		-p $LOCAL_LICENSE_SSL:8443 \
+		--name $CONTAINER_NAME \
+		$2 \
+		/bin/bash -c ./home/ecareme/script/run >> $FOLDER_PATH/$1/container_id
+
+# get container id
+CONTAINER_ID=$(cat $FOLDER_PATH/$1/container_id)
+echo $CONTAINER_ID
+
+docker cp $FOLDER_PATH/$1/etc $CONTAINER_ID:/home/ecareme/etc/locallicense
+docker cp $FOLDER_PATH/$1/locallicense $CONTAINER_ID:/home/ecareme/src
+
+# start tomcat
+docker exec $CONTAINER_ID ./home/ecareme/script/start_tomcat
+
+# syncState
+#java -jar /home/ecareme/jar/syncState.jar 'new' $MODULE $FOLDER_MANE $(cat $FOLDER_MANE) $2
+
+#rm $FOLDER_MANE

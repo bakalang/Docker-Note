@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+# start mariadb
+#./run_mariadb
+
+# start zk
+#./run_zookeeper
+#./run_private_zookeeper
+
+# start pearl 
+#./run_pearl $(ls -tr $SOURCE_PATH/omnistore_cloud/pearl/bak | tail -1) img:pearl
+
+# start sp
+#./run_sp $(ls -tr $SOURCE_PATH/one.serviceportal/portalapi/bak | tail -1) img
+
+# start omnistore2
+#./omnistore2/run_sg $(ls -tr $SOURCE_PATH/omnistore.servicegateway/servicegatewayapi/bak | tail -1) img
+#./omnistore2/run_manager_studio $(ls -tr $SOURCE_PATH/omnistore.servicegateway/ManagerStudio-FETnet/bak | tail -1) img
+#./omnistore2/run_ir $(ls -tr $SOURCE_PATH/omnistore.filerelay/inforelayapi/bak | tail -1) img
+#./omnistore2/run_wr $(ls -tr $SOURCE_PATH/omnistore.filerelay/filerelayapi/bak | tail -1) img
+
+# start other
+#./run_otm $(ls -tr $SOURCE_PATH/omnistore_cloud/otm/bak  | tail -1) img
+#./run_coral_facade $(ls -tr $SOURCE_PATH/omnistore_cloud/coral/bak_facade | tail -1) img
+
+# start omnisearch
+./run_solr $(ls -tr $SOURCE_PATH/omnistore_cloud/solr | tail -1) img:solr
+./run_solrcommander $(ls -tr $SOURCE_PATH/omnistore_cloud/solrcommander/bak | tail -1) img
+./run_eventhandler $(ls -tr $SOURCE_PATH/omnistore_cloud/eventhandler/bak | tail -1) img:pearl_client
+./run_searchserver $(ls -tr $SOURCE_PATH/sandbox/searchserver/bak | tail -1) img
+
+# start private
+#./ptivate/run_globallicense $(ls -tr $SOURCE_PATH/omnistore_cloud/license/globallicense/bak | tail -1) img
+#./private/run_locallicense $(ls -tr $SOURCE_PATH/omnistore_cloud/license/locallicense/bak | tail -1) img
+#./private/run_broker $(ls -tr $SOURCE_PATH/omnistore.servicegateway/AuthenticationBroker_ALL/AuthenticationBroker_AD/bak| tail -1) img
+#./private/run_sg $(ls -tr $SOURCE_PATH/omnistore.servicegateway/servicegatewayapi/bak | tail -1) img
+
+

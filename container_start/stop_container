@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# docker source
+source docker_env
+
+for VAR in $@
+do
+
+	# stop container
+	docker stop $VAR
+
+	# remove container
+	docker rm -v $VAR
+
+	# clean log
+	rm -rf $HOST_LOG_PATH/$VAR
+
+done
